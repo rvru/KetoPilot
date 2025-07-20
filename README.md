@@ -14,268 +14,233 @@ A sophisticated Flutter application for metabolic health optimization, focused o
 ### UI/UX Excellence
 - **Professional Medical Theme**: Clean, medical-grade green color scheme
 - **Responsive Design**: Optimized for all screen sizes from iPhone SE to iPad Pro
-- **Dynamic Island Support**: Header layout optimized for modern iPhone designs
-- **MacroFactor-Inspired Interface**: Clean, intuitive data entry experience
-- **Animated Visualizations**: Smooth progress indicators and status animations
+- **MacroFactor-Inspired Design**: Clean bottom navigation with floating action button
+- **Swipeable Views**: Swipe between Daily and Weekly views for both Nutrition and Biomarkers
+- **Smooth Animations**: Polished micro-interactions throughout the app
 
-### Technical Features
-- **Clean Architecture**: Feature-based organization with clear separation of concerns
-- **Cross-Platform**: Runs on iOS, Android, macOS, Web, Windows, and Linux
-- **Modern Flutter**: Built with latest Flutter SDK and best practices
-- **State Management**: Efficient state handling with proper data flow
-- **Freezed Integration**: Immutable data models with JSON serialization
-
-## 🛠 Prerequisites
-
-Before running this project, make sure you have the following installed:
-
-- **Flutter SDK** (>=3.19.0): [Installation Guide](https://docs.flutter.dev/get-started/install)
-- **Dart SDK** (>=3.3.0): Included with Flutter
-- **IDE**: VS Code, Android Studio, or IntelliJ IDEA
-- **Platform-specific requirements**:
-  - **iOS**: Xcode 15.0+ (macOS only)
-  - **Android**: Android Studio with Android SDK
-  - **Web**: Chrome browser
-  - **Desktop**: Platform-specific tooling
+### Dashboard Features
+- **Daily & Weekly Nutrition**: Swipe between daily macro bars and weekly nutrition trends
+- **Daily & Weekly Biomarkers**: Toggle between current readings and weekly biomarker patterns
+- **GKI Circle Display**: Prominent glucose-ketone index with color-coded health status
+- **Quick Actions Grid**: Fast access to logging, food diary, health tracking, and analytics
+- **Health Metrics Overview**: Weight, heart rate, and other key indicators
+- **Recent Readings**: Timeline of recent glucose and ketone measurements
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/priyamthakkar2001/KetoPilot.git
-cd KetoPilot
-```
+### Prerequisites
+- Flutter SDK (>=3.0.0)
+- Dart SDK (>=3.0.0)
+- iOS Simulator or Android Emulator
+- Xcode (for iOS development)
+- Android Studio (for Android development)
 
-### 2. Install Dependencies
-```bash
-flutter pub get
-```
+### Installation
 
-### 3. Generate Required Files
-```bash
-# Generate code for auto_route, freezed, and json_annotation
-flutter packages pub run build_runner build --delete-conflicting-outputs
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/priyamthakkar2001/KetoPilot.git
+   cd KetoPilot
+   ```
 
-### 4. Verify Installation
-```bash
-# Check if Flutter is properly configured
-flutter doctor
+2. **Install dependencies**
+   ```bash
+   flutter pub get
+   ```
 
-# List available devices
-flutter devices
-```
+3. **Generate auto route files**
+   ```bash
+   flutter packages pub run build_runner build
+   ```
 
-## 📱 Running the App
+4. **Run the application**
+   ```bash
+   # iOS Simulator
+   flutter run -d ios
+   
+   # Android Emulator  
+   flutter run -d android
+   
+   # macOS Desktop
+   flutter run -d macos
+   
+   # Web Browser
+   flutter run -d chrome
+   ```
 
-### iOS Simulator
-```bash
-# Start iOS simulator and run
-flutter run -d ios
+## 📊 Core Widgets
 
-# Or specify a specific simulator
-flutter run -d "iPhone 15 Pro"
-```
+### MacroBarsWidget
+Displays daily macro consumption with animated vertical bars:
+- **Carbs**: Red bars with dotted limit lines
+- **Protein**: Blue bars with solid goal lines  
+- **Fat**: Green bars with solid goal lines
+- Color changes when limits are exceeded
 
-### Android Emulator
-```bash
-# Start Android emulator and run
-flutter run -d android
+### MoleculeBarsWidget
+Shows biomarker readings with health status indicators:
+- **Glucose**: Orange bars (mg/dL) with optimal/good/high status
+- **BHB**: Yellow bars (mmol/L) with ketosis indicators
+- **GKI**: Blue bars with optimal ranges
 
-# Or specify a specific emulator
-flutter run -d emulator-5554
-```
+### SwipeableSectionWidget
+Container for Daily/Weekly views with:
+- Smooth PageView transitions
+- Tab indicators showing current view
+- Visual swipe hints
+- Consistent action buttons
 
-### Web Browser
-```bash
-# Run in Chrome (default)
-flutter run -d chrome
+## 🎨 Design System
 
-# Run in web mode with specific renderer
-flutter run -d web-server --web-port 8080
-```
+### Color Palette
+- **Primary**: Medical green (#4CAF50)
+- **Secondary**: Complementary medical blue
+- **Status Colors**: 
+  - Optimal: Green
+  - Good: Orange  
+  - Critical: Red
+- **Background**: Clean whites and light grays
 
-### Desktop Platforms
-```bash
-# macOS
-flutter run -d macos
+### Typography
+- **Headlines**: Bold, medical-grade typography
+- **Body Text**: Clean, readable sans-serif
+- **Data Values**: Emphasized numerical displays
+- **Status Labels**: Color-coded health indicators
 
-# Windows
-flutter run -d windows
+## 🏗️ Architecture
 
-# Linux
-flutter run -d linux
-```
-
-## 📁 Project Structure
-
+### Clean Architecture Implementation
 ```
 lib/
-├── core/                          # Core functionality
-│   ├── constants/                 # App-wide constants
-│   ├── router/                    # Navigation routing
-│   └── themes/                    # App theming
-├── features/                      # Feature modules
-│   ├── auth/                      # Authentication
-│   ├── dashboard/                 # Main dashboard
-│   │   ├── data/                  # Data layer
-│   │   ├── domain/                # Business logic
-│   │   └── presentation/          # UI components
-│   │       ├── pages/             # Screen pages
-│   │       └── widgets/           # Reusable widgets
-│   ├── data_entry/                # Data input screens
-│   ├── food_diary/                # Food tracking
-│   ├── health_logging/            # Health metrics
-│   ├── onboarding/                # User onboarding
-│   └── settings/                  # App settings
-├── shared/                        # Shared components
-│   ├── extensions/                # Dart extensions
-│   ├── utils/                     # Utility functions
-│   └── widgets/                   # Common widgets
-└── main.dart                      # App entry point
+├── core/                   # Core utilities and constants
+│   ├── constants/         # App-wide constants
+│   ├── themes/           # Theme configuration
+│   └── router/           # Auto route configuration
+├── features/             # Feature-based organization
+│   ├── dashboard/        # Main dashboard feature
+│   ├── data_entry/       # Biomarker logging
+│   ├── food_diary/       # Nutrition tracking
+│   └── health_logging/   # Symptom tracking
+└── shared/              # Shared widgets and utilities
+    ├── widgets/         # Reusable UI components
+    └── extensions/      # Dart extensions
 ```
 
-## 🔧 Configuration
+### State Management
+- **Riverpod**: For reactive state management
+- **Freezed**: For immutable data classes
+- **Auto Route**: For declarative navigation
 
-### Environment Setup
-Create configuration files for different environments:
+## 📈 Data Models
 
-1. **Development**: Default configuration
-2. **Staging**: Testing environment
-3. **Production**: Live app configuration
-
-### API Configuration
-Update API endpoints in `lib/core/constants/app_constants.dart`:
-
+### HealthMetric
 ```dart
-class AppConstants {
-  static const String apiBaseUrl = 'https://your-api-url.com';
-  static const String appName = 'KetoPilot';
-  // Add your configuration here
+@freezed
+class HealthMetric with _$HealthMetric {
+  const factory HealthMetric({
+    required String id,
+    required DateTime timestamp,
+    required double value,
+    required String unit,
+    required HealthMetricType type,
+  }) = _HealthMetric;
 }
 ```
 
-## 🧪 Testing
+### FoodEntry
+```dart
+@freezed 
+class FoodEntry with _$FoodEntry {
+  const factory FoodEntry({
+    required String id,
+    required String name,
+    required double carbsGrams,
+    required double proteinGrams,
+    required double fatGrams,
+    required DateTime timestamp,
+  }) = _FoodEntry;
+}
+```
 
-### Run Unit Tests
+## 🔧 Development Tools
+
+### Code Generation
 ```bash
+# Generate freezed classes
+flutter packages pub run build_runner build
+
+# Watch for changes (development)
+flutter packages pub run build_runner watch
+```
+
+### Testing
+```bash
+# Run unit tests
 flutter test
+
+# Run integration tests  
+flutter drive --target=test_driver/app.dart
 ```
 
-### Run Integration Tests
+### Build & Release
 ```bash
-flutter test integration_test/
-```
-
-### Run Widget Tests
-```bash
-flutter test test/widget_test.dart
-```
-
-### Coverage Report
-```bash
-flutter test --coverage
-genhtml coverage/lcov.info -o coverage/html
-```
-
-## 🔨 Building for Production
-
-### Android APK
-```bash
-flutter build apk --release
-```
-
-### Android App Bundle
-```bash
-flutter build appbundle --release
-```
-
-### iOS App Store
-```bash
+# Build for iOS
 flutter build ios --release
-```
 
-### Web Application
-```bash
+# Build for Android
+flutter build appbundle --release
+
+# Build for macOS
+flutter build macos --release
+
+# Build for Web
 flutter build web --release
 ```
 
-### Desktop Applications
-```bash
-# macOS
-flutter build macos --release
+## 📱 Platform Support
 
-# Windows
-flutter build windows --release
+| Platform | Status | Notes |
+|----------|--------|-------|
+| iOS | ✅ Supported | iOS 11.0+ |
+| Android | ✅ Supported | Android 6.0+ (API 23+) |
+| macOS | ✅ Supported | macOS 10.14+ |
+| Web | ✅ Supported | Chrome, Safari, Firefox |
+| Windows | 🔄 Planned | Future release |
+| Linux | 🔄 Planned | Future release |
 
-# Linux
-flutter build linux --release
-```
+## 🤝 Contributing
 
-## 📋 Development Guidelines
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-### Code Style
-- Follow [Dart Style Guide](https://dart.dev/guides/language/effective-dart)
-- Use `flutter analyze` to check for issues
-- Format code with `dart format .`
+### Development Guidelines
+- Follow the established clean architecture patterns
+- Use Freezed for data models
+- Implement proper error handling
+- Add unit tests for new features
+- Follow the existing design system
+- Ensure responsive design across all screen sizes
 
-### Git Workflow
-1. Create feature branches from `main`
-2. Make atomic commits with clear messages
-3. Submit pull requests for review
-4. Ensure all tests pass before merging
+## 📝 License
 
-### Adding New Features
-1. Create feature directory in `lib/features/`
-2. Follow clean architecture pattern
-3. Add unit tests for business logic
-4. Update documentation
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🛡 Dependencies
+## 🙏 Acknowledgments
 
-### Core Dependencies
-- **flutter**: SDK framework
-- **auto_route**: Navigation and routing
-- **freezed**: Immutable data classes
-- **json_annotation**: JSON serialization
-- **riverpod**: State management
-- **fl_chart**: Data visualization
+- **MacroFactor**: Design inspiration for clean nutrition tracking UI
+- **Flutter Community**: For excellent packages and resources
+- **Medical Research**: Ketogenic therapy guidelines and GKI research
 
-### Development Dependencies
-- **build_runner**: Code generation
-- **auto_route_generator**: Route generation
-- **freezed**: Code generation for data classes
-- **json_serializable**: JSON serialization generation
+## 📞 Support
 
-See `pubspec.yaml` for complete dependency list.
+For support, questions, or feature requests:
+- Create an issue on GitHub
+- Contact the development team
+- Check the documentation wiki
 
-## 🐛 Troubleshooting
+---
 
-### Common Issues
-
-**Build Errors**:
-```bash
-# Clean build cache
-flutter clean
-flutter pub get
-flutter packages pub run build_runner build --delete-conflicting-outputs
-```
-
-**iOS Build Issues**:
-```bash
-# Update iOS pods
-cd ios && pod install --repo-update
-```
-
-**Android Build Issues**:
-```bash
-# Clean Android build
-cd android && ./gradlew clean
-```
-
-**Code Generation Issues**:
-```bash
-# Regenerate all generated files
-flutter packages pub run build_runner clean
-flutter packages pub run build_runner build --delete-conflicting-outputs
-```
+**Built with ❤️ for the metabolic health community**

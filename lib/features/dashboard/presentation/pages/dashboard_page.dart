@@ -6,6 +6,9 @@ import '../../../../core/themes/app_theme.dart';
 import '../../../../shared/widgets/app_drawer.dart';
 import '../../../food_diary/presentation/widgets/macro_bars_widget.dart';
 import '../widgets/molecule_bars_widget.dart';
+import '../widgets/swipeable_section_widget.dart';
+import '../widgets/weekly_nutrition_widget.dart';
+import '../widgets/weekly_molecules_widget.dart';
 
 @RoutePage()
 class DashboardPage extends StatefulWidget {
@@ -60,46 +63,97 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          _navigateToIndex(index);
-        },
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            activeIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+              _navigateToIndex(index);
+            },
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedItemColor: AppTheme.primaryColor,
+            unselectedItemColor: AppTheme.textSecondaryColor,
+            selectedLabelStyle: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+            items: const [
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.dashboard_outlined, size: 22),
+                ),
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.dashboard, size: 22),
+                ),
+                label: 'Dashboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.restaurant_outlined, size: 22),
+                ),
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.restaurant, size: 22),
+                ),
+                label: 'Diary',
+              ),
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.analytics_outlined, size: 22),
+                ),
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.analytics, size: 22),
+                ),
+                label: 'Trends',
+              ),
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.more_horiz, size: 22),
+                ),
+                activeIcon: Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Icon(Icons.more_horiz, size: 22),
+                ),
+                label: 'More',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            activeIcon: Icon(Icons.add_circle),
-            label: 'Add Data',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics_outlined),
-            activeIcon: Icon(Icons.analytics),
-            label: 'Analytics',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.router.pushNamed('/data-entry');
         },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Data'),
         backgroundColor: AppTheme.primaryColor,
+        elevation: 4,
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -378,7 +432,7 @@ class _DashboardPageState extends State<DashboardPage> {
             physics: const NeverScrollableScrollPhysics(),
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: 1.2,
+            childAspectRatio: 1.4,
             children: [
               _buildQuickActionCard(
                 icon: Icons.add_circle,
@@ -431,13 +485,13 @@ class _DashboardPageState extends State<DashboardPage> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: color, size: 22),
-              const SizedBox(height: 12),
+              Icon(icon, color: color, size: 20),
+              const SizedBox(height: 8),
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -448,7 +502,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 subtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -468,76 +522,44 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildMacroPreviewSection() {
     return Column(
       children: [
-        // Daily Nutrition Section
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Daily Nutrition',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => context.router.pushNamed('/food-diary'),
-                    child: const Text('View Diary'),
-                  ),
-                ],
-              ),
-            ],
+        // Swipeable Nutrition Section (Daily/Weekly)
+        SwipeableSectionWidget(
+          title: 'Nutrition',
+          dailyWidget: MacroBarsWidget(
+            carbsGrams: 11.0, // Example values from the slide
+            proteinGrams: 75.0,
+            fatGrams: 50.0,
+            carbsLimit: 20.0, // Using new parameter names
+            proteinGoal: 80.0,
+            fatGoal: 45.0,
+            maxBarHeight: 120.0,
+            showTargetLines: true,
+            showValues: true,
           ),
-        ),
-        MacroBarsWidget(
-          carbsGrams: 11.0, // Example values from the slide
-          proteinGrams: 75.0,
-          fatGrams: 50.0,
-          carbsLimit: 20.0, // Using new parameter names
-          proteinGoal: 80.0,
-          fatGoal: 45.0,
-          maxBarHeight: 120.0,
-          showTargetLines: true,
-          showValues: true,
+          weeklyWidget: const WeeklyNutritionWidget(),
+          actionText: 'Food Diary',
+          onActionTap: () => context.router.pushNamed('/food-diary'),
         ),
 
-        // Daily Molecules Section
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'Daily Molecules',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const Spacer(),
-                  TextButton(
-                    onPressed: () => context.router.pushNamed('/data-entry'),
-                    child: const Text('Log Data'),
-                  ),
-                ],
-              ),
-            ],
+        const SizedBox(height: 8),
+
+        // Swipeable Molecules Section (Daily/Weekly)
+        SwipeableSectionWidget(
+          title: 'Biomarkers',
+          dailyWidget: MoleculeBarsWidget(
+            glucoseMgDl: 85.0, // Example values
+            bhbMmol: 1.2,
+            gki: 4.1,
+            glucoseTarget: 100.0,
+            bhbTarget: 1.5,
+            gkiTarget: 1.0,
+            maxBarHeight: 120.0,
+            showTargetLines: true,
+            showValues: true,
           ),
-        ),
-        MoleculeBarsWidget(
-          glucoseMgDl: 85.0, // Example values
-          bhbMmol: 1.2,
-          gki: 4.1,
-          glucoseTarget: 100.0,
-          bhbTarget: 1.5,
-          gkiTarget: 1.0,
-          maxBarHeight: 120.0,
-          showTargetLines: true,
-          showValues: true,
+          weeklyWidget: const WeeklyMoleculesWidget(),
+          actionText: 'Log Data',
+          onActionTap: () => context.router.pushNamed('/data-entry'),
         ),
       ],
     );
@@ -811,13 +833,13 @@ class _DashboardPageState extends State<DashboardPage> {
         // Already on dashboard
         break;
       case 1:
-        context.router.pushNamed('/data-entry');
+        context.router.pushNamed('/food-diary');
         break;
       case 2:
-        // TODO: Navigate to analytics
+        // TODO: Navigate to trends/analytics
         break;
       case 3:
-        // TODO: Navigate to profile
+        context.router.pushNamed('/settings');
         break;
     }
   }

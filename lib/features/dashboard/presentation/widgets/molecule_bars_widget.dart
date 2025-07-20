@@ -57,18 +57,18 @@ class _MoleculeBarsWidgetState extends State<MoleculeBarsWidget>
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
             _buildHeader(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             _buildMoleculeBars(),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             _buildLegend(),
           ],
         ),
