@@ -85,7 +85,7 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
           'Daily Nutrition',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimaryColor,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const Spacer(),
@@ -138,9 +138,6 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
   }
 
   Widget _buildCarbsBar(double maxValue, double availableHeight) {
-    double barHeight =
-        (widget.carbsGrams / maxValue) * availableHeight * _animation.value;
-    double limitHeight = (widget.carbsLimit / maxValue) * availableHeight;
     bool exceedsLimit = widget.carbsGrams > widget.carbsLimit;
     Color barColor = exceedsLimit ? Colors.red : Colors.orange;
 
@@ -257,7 +254,9 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
                 width: 45,
                 height: availableHeight * 0.75,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF243040)
+                      : Colors.grey.shade200,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Stack(
@@ -287,7 +286,14 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
                       height: barHeight * 0.75,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [actualColor.withOpacity(0.7), actualColor],
+                          colors: [
+                            actualColor.withOpacity(
+                              Theme.of(context).brightness == Brightness.dark
+                                  ? 0.9
+                                  : 0.7,
+                            ),
+                            actualColor,
+                          ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                         ),
@@ -306,7 +312,7 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
               label.toUpperCase(),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimaryColor,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 11,
               ),
             ),
@@ -316,7 +322,9 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
               Text(
                 '${value.toStringAsFixed(0)} / ${targetValue.toStringAsFixed(0)}g',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondaryColor,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 9,
                 ),
               ),
@@ -347,7 +355,9 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF1A202C)
+            : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
@@ -414,7 +424,7 @@ class _MacroBarsWidgetState extends State<MacroBarsWidget>
           '${value.toStringAsFixed(0)}g',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontSize: 9,
-            color: AppTheme.textSecondaryColor,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           ),
         ),
       ],

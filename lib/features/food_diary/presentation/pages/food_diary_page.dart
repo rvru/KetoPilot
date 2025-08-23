@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_constants.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/themes/app_theme.dart';
 import '../widgets/macro_bars_widget.dart';
 
@@ -25,78 +25,79 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
   final double _proteinGoal = 100.0; // Changed to goal for protein
   final double _fatGoal = 150.0; // Changed to goal for fat
 
+  // Updated to use DateTime timestamps for chronological ordering
   final List<_FoodEntryData> _todaysEntries = [
     _FoodEntryData(
       name: 'Avocado',
-      mealType: 'Breakfast',
       carbs: 4.0,
       protein: 2.0,
       fat: 15.0,
       calories: 160,
-      time: '8:30 AM',
+      timestamp: DateTime.now().copyWith(hour: 8, minute: 30, second: 0),
+      servingSize: '1 medium',
     ),
     _FoodEntryData(
       name: 'Eggs (2 large)',
-      mealType: 'Breakfast',
       carbs: 1.0,
       protein: 12.0,
       fat: 10.0,
       calories: 140,
-      time: '8:30 AM',
+      timestamp: DateTime.now().copyWith(hour: 8, minute: 35, second: 0),
+      servingSize: '2 large',
     ),
     _FoodEntryData(
       name: 'Chicken Breast',
-      mealType: 'Lunch',
       carbs: 0.0,
       protein: 54.0,
       fat: 3.0,
       calories: 231,
-      time: '12:30 PM',
+      timestamp: DateTime.now().copyWith(hour: 12, minute: 30, second: 0),
+      servingSize: '200g',
     ),
     _FoodEntryData(
       name: 'Olive Oil',
-      mealType: 'Lunch',
       carbs: 0.0,
       protein: 0.0,
       fat: 14.0,
       calories: 120,
-      time: '12:30 PM',
+      timestamp: DateTime.now().copyWith(hour: 12, minute: 32, second: 0),
+      servingSize: '1 tbsp',
     ),
     _FoodEntryData(
       name: 'Spinach Salad',
-      mealType: 'Lunch',
       carbs: 3.0,
       protein: 3.0,
       fat: 0.0,
       calories: 23,
-      time: '12:30 PM',
+      timestamp: DateTime.now().copyWith(hour: 12, minute: 35, second: 0),
+      servingSize: '2 cups',
     ),
     _FoodEntryData(
       name: 'Almonds',
-      mealType: 'Snack',
       carbs: 6.0,
       protein: 14.0,
       fat: 37.0,
       calories: 413,
-      time: '3:00 PM',
+      timestamp: DateTime.now().copyWith(hour: 15, minute: 0, second: 0),
+      servingSize: '30g',
     ),
     _FoodEntryData(
       name: 'Salmon',
-      mealType: 'Dinner',
       carbs: 0.0,
       protein: 25.0,
       fat: 12.0,
       calories: 208,
-      time: '7:00 PM',
+      timestamp: DateTime.now().copyWith(hour: 19, minute: 0, second: 0),
+      servingSize: '150g',
     ),
     _FoodEntryData(
       name: 'Broccoli',
-      mealType: 'Dinner',
       carbs: 6.0,
       protein: 3.0,
       fat: 0.0,
       calories: 34,
-      time: '7:00 PM',
+      timestamp: DateTime.now().copyWith(hour: 19, minute: 5, second: 0),
+      servingSize: '1 cup',
     ),
   ];
 
@@ -151,6 +152,10 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
   }
 
   Widget _buildTodayTab() {
+    // Sort entries chronologically
+    final sortedEntries = [..._todaysEntries]
+      ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -164,7 +169,9 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
             fatGoal: _fatGoal,
           ),
           _buildMacroSummary(),
-          _buildMealSections(),
+          _buildQuickAddSection(),
+          _buildTimelineHeader(),
+          _buildFoodTimeline(sortedEntries),
         ],
       ),
     );
@@ -308,32 +315,12 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
     );
   }
 
-  Widget _buildMealSections() {
-    final mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
-
-    return Column(
-      children: mealTypes.map((mealType) {
-        final mealEntries = _todaysEntries
-            .where((entry) => entry.mealType == mealType)
-            .toList();
-        return _buildMealSection(mealType, mealEntries);
-      }).toList(),
-    );
-  }
-
-  Widget _buildMealSection(String mealType, List<_FoodEntryData> entries) {
-    double totalCarbs = entries.fold(0, (sum, entry) => sum + entry.carbs);
-    double totalProtein = entries.fold(0, (sum, entry) => sum + entry.protein);
-    double totalFat = entries.fold(0, (sum, entry) => sum + entry.fat);
-    double totalCalories = entries.fold(
-      0,
-      (sum, entry) => sum + entry.calories,
-    );
-
+  Widget _buildQuickAddSection() {
     return Container(
       margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.cardColor,
+        gradient: AppTheme.cardGradient,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -344,169 +331,296 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
           ),
         ],
       ),
-      child: Column(
+      child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withOpacity(0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
+          Expanded(
+            child: ElevatedButton.icon(
+              onPressed: () => _addFoodAtTime(DateTime.now()),
+              icon: const Icon(Icons.add),
+              label: const Text('Add Now'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-            ),
-            child: Row(
-              children: [
-                Icon(_getMealIcon(mealType), color: AppTheme.primaryColor),
-                const SizedBox(width: 8),
-                Text(
-                  mealType,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                if (entries.isNotEmpty)
-                  Text(
-                    '${totalCalories.toStringAsFixed(0)} cal',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textSecondaryColor,
-                    ),
-                  ),
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: () => _addFoodToMeal(mealType),
-                ),
-              ],
             ),
           ),
-          if (entries.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'No foods logged for $mealType',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondaryColor,
+          const SizedBox(width: 12),
+          Expanded(
+            child: OutlinedButton.icon(
+              onPressed: () => _addFoodAtCustomTime(),
+              icon: const Icon(Icons.schedule),
+              label: const Text('Custom Time'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppTheme.primaryColor,
+                side: const BorderSide(color: AppTheme.primaryColor),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-            )
-          else
-            ...entries.map((entry) => _buildFoodEntry(entry)),
-          if (entries.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(12),
-                  bottomRight: Radius.circular(12),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildMacroTotal('C', totalCarbs, Colors.orange),
-                  _buildMacroTotal('P', totalProtein, Colors.blue),
-                  _buildMacroTotal('F', totalFat, Colors.green),
-                ],
               ),
             ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildFoodEntry(_FoodEntryData entry) {
+  Widget _buildTimelineHeader() {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppTheme.dividerColor, width: 0.5),
-        ),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
+          const Icon(Icons.timeline, color: AppTheme.primaryColor, size: 20),
+          const SizedBox(width: 8),
+          Text(
+            'Food Timeline',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primaryColor,
+            ),
+          ),
+          const Spacer(),
+          Text(
+            '${_todaysEntries.length} entries',
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondaryColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFoodTimeline(List<_FoodEntryData> sortedEntries) {
+    if (sortedEntries.isEmpty) {
+      return Container(
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: AppTheme.cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.restaurant_menu, size: 48, color: Colors.grey.shade400),
+            const SizedBox(height: 12),
+            Text(
+              'No food logged today',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Tap "Add Now" to log your first meal',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: sortedEntries.asMap().entries.map((entry) {
+        final index = entry.key;
+        final foodEntry = entry.value;
+        final isLast = index == sortedEntries.length - 1;
+
+        return _buildTimelineEntry(foodEntry, isLast);
+      }).toList(),
+    );
+  }
+
+  Widget _buildTimelineEntry(_FoodEntryData entry, bool isLast) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Timeline indicator
+          Column(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryColor.withOpacity(0.3),
+                      spreadRadius: 2,
+                      blurRadius: 4,
+                    ),
+                  ],
+                ),
+              ),
+              if (!isLast)
+                Container(width: 2, height: 80, color: Colors.grey.shade300),
+            ],
+          ),
+          const SizedBox(width: 16),
+          // Food entry content
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Container(
+              margin: EdgeInsets.only(bottom: isLast ? 16 : 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: _buildTimelineEntryContent(entry),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineEntryContent(_FoodEntryData entry) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Time and food name
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                DateFormat('h:mm a').format(entry.timestamp),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.primaryColor,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    entry.name,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  if (entry.servingSize.isNotEmpty)
+                    Text(
+                      entry.servingSize,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, size: 20),
+              onPressed: () => _editFoodEntry(entry),
+              constraints: const BoxConstraints(),
+              padding: const EdgeInsets.all(4),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Macro information
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildMacroChip('C', entry.carbs, Colors.orange),
+                  _buildMacroChip('P', entry.protein, Colors.blue),
+                  _buildMacroChip('F', entry.fat, Colors.green),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  entry.name,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                  '${entry.calories.toStringAsFixed(0)}',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.primaryColor,
+                  ),
                 ),
-                const SizedBox(height: 4),
                 Text(
-                  entry.time,
+                  'cal',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondaryColor,
                   ),
                 ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${entry.calories.toStringAsFixed(0)} cal',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'C:${entry.carbs.toStringAsFixed(0)}g P:${entry.protein.toStringAsFixed(0)}g F:${entry.fat.toStringAsFixed(0)}g',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondaryColor,
-                ),
-              ),
-            ],
-          ),
-          IconButton(
-            icon: const Icon(Icons.edit_outlined),
-            onPressed: () => _editFoodEntry(entry),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMacroTotal(String label, double value, Color color) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          '${value.toStringAsFixed(0)}g',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          ],
         ),
       ],
     );
   }
 
-  IconData _getMealIcon(String mealType) {
-    switch (mealType) {
-      case 'Breakfast':
-        return Icons.free_breakfast;
-      case 'Lunch':
-        return Icons.lunch_dining;
-      case 'Dinner':
-        return Icons.dinner_dining;
-      case 'Snack':
-        return Icons.cookie;
-      default:
-        return Icons.restaurant;
-    }
+  Widget _buildMacroChip(String label, double value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            '${value.toStringAsFixed(0)}g',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {
@@ -565,14 +679,32 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
     );
   }
 
-  void _addFoodToMeal(String mealType) {
-    // TODO: Implement add food to specific meal
+  void _addFoodAtTime(DateTime time) {
+    // TODO: Implement add food at specific time
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Add food to $mealType coming soon!'),
+        content: Text(
+          'Add food at ${DateFormat('h:mm a').format(time)} coming soon!',
+        ),
         backgroundColor: AppTheme.infoColor,
       ),
     );
+  }
+
+  Future<void> _addFoodAtCustomTime() async {
+    final TimeOfDay? time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (time != null) {
+      final DateTime customDateTime = DateTime.now().copyWith(
+        hour: time.hour,
+        minute: time.minute,
+        second: 0,
+      );
+      _addFoodAtTime(customDateTime);
+    }
   }
 
   void _editFoodEntry(_FoodEntryData entry) {
@@ -588,20 +720,20 @@ class _FoodDiaryPageState extends State<FoodDiaryPage>
 
 class _FoodEntryData {
   final String name;
-  final String mealType;
   final double carbs;
   final double protein;
   final double fat;
   final double calories;
-  final String time;
+  final DateTime timestamp;
+  final String servingSize;
 
   _FoodEntryData({
     required this.name,
-    required this.mealType,
     required this.carbs,
     required this.protein,
     required this.fat,
     required this.calories,
-    required this.time,
+    required this.timestamp,
+    required this.servingSize,
   });
 }
