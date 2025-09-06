@@ -39,7 +39,7 @@ A sophisticated Flutter application for metabolic health optimization, focused o
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/priyamthakkar2001/KetoPilot.git
+   git clone https://github.com/rvru/KetoPilot.git
    cd KetoPilot
    ```
 
