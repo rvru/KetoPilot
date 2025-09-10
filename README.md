@@ -2,7 +2,15 @@
 
 A sophisticated Flutter application for metabolic health optimization, focused on gram-centric macro tracking and biomarker monitoring for ketogenic therapy.
 
-**Mission Statement
+# Mission Statement
+To provide transformative support and encouragement for individuals who might be:
+- a diabetic tracking their glucose and estimated insulin levels
+- mental health focused individuals with bipolar disorder, schizophrenia, or epilepsy, tracking ketone levels
+- the cancer patient who is augmenting their standard of care with a diet targeting their glucose ketone index (GKI).
+- the N=1 citizen scientist who is curious about their own metabolic health
+- the loving parent who is taking care of their child due to their epilepsy or type 1 diabetes
+- and the stalwart endurance athlete who is dialing in their optimal fueling strategy
+In their own individual way, each is pursuing their transformation through personalized precision management of their metabolic state. 
 
 ## 📱 Features
 
